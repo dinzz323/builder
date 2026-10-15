@@ -1,8 +1,3 @@
-// ⚠️ KONFIGURASI MANUAL - ISI DI SINI
-const GITHUB_OWNER = "dinzz323";
-const GITHUB_REPO = "builder";
-const GITHUB_TOKEN = "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"; // ← GANTI DENGAN TOKEN KAMU
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   
@@ -17,14 +12,14 @@ export default async function handler(req, res) {
   }
   
   try {
-    const ghOwner = GITHUB_OWNER;
-    const ghRepo = GITHUB_REPO;
-    const ghToken = GITHUB_TOKEN;
+    const ghOwner = process.env.GITHUB_OWNER;
+    const ghRepo = process.env.GITHUB_REPO;
+    const ghToken = process.env.GITHUB_TOKEN;
     
-    if (!ghOwner || !ghRepo || !ghToken || ghToken === 'ghp_xxxxxxxxxxxxxxxxxxxx') {
+    if (!ghOwner || !ghRepo || !ghToken) {
       return res.status(500).json({
         status: 'error',
-        message: 'Token GitHub belum diisi di api/status.js'
+        message: `Server belum dikonfigurasi. Missing: ${!ghOwner ? 'GITHUB_OWNER ' : ''}${!ghRepo ? 'GITHUB_REPO ' : ''}${!ghToken ? 'GITHUB_TOKEN' : ''}`
       });
     }
     
