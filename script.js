@@ -73,13 +73,11 @@ async function startBuild(config, ids) {
     downloadSection.innerHTML = '';
     
     try {
-        // 1. Convert icon to base64
         let iconBase64 = null;
         if (config.icon) {
             iconBase64 = await fileToBase64(config.icon);
         }
         
-        // 2. For HTML mode: zip all files
         let htmlContentBase64 = null;
         if (config.type === 'html' && config.files && config.files.length) {
             progressMsg.textContent = 'Mengemas file HTML...';
@@ -105,7 +103,6 @@ async function startBuild(config, ids) {
         progressMsg.textContent = 'Mengirim ke server build...';
         progressFill.style.width = '30%';
         
-        // 3. Send to backend API
         const response = await fetch('/api/build', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -135,9 +132,8 @@ async function startBuild(config, ids) {
         progressMsg.textContent = 'Build dimulai! Menunggu GitHub Actions...';
         progressFill.style.width = '40%';
         
-        // 4. Polling status
         let attempts = 0;
-        const maxAttempts = 120; // 6 menit
+        const maxAttempts = 120;
         
         const pollInterval = setInterval(async () => {
             attempts++;
@@ -156,7 +152,7 @@ async function startBuild(config, ids) {
                     progressMsg.textContent = `APK "${config.appName}" siap diunduh!`;
                     
                     const ghOwner = statusData.githubOwner || 'USERNAME';
-                    const ghRepo = statusData.githubRepo || 'apk-builder';
+                    const ghRepo = statusData.githubRepo || 'builder';
                     const finalRunId = statusData.runId || runId;
                     
                     downloadSection.innerHTML = `
@@ -166,7 +162,7 @@ async function startBuild(config, ids) {
                             <i class="fas fa-download"></i> Lihat & Download APK
                         </a>
                         <p class="hint-text" style="margin-top:1rem;">
-                            Klik tombol di atas → scroll ke bagian <strong>Artifacts</strong> → download <strong>apk-xxx.zip</strong>
+                            Klik tombol di atas → scroll ke bagian <strong>Artifacts</strong> → download <strong>apk-build.zip</strong>
                         </p>
                     `;
                     
@@ -187,7 +183,7 @@ async function startBuild(config, ids) {
                 progressMsg.textContent = 'Build terlalu lama. Cek GitHub Actions secara manual.';
             }
             
-        }, 3000); // every 3 seconds
+        }, 3000);
         
     } catch (err) {
         console.error('Build error:', err);
@@ -203,7 +199,6 @@ setupUpload('iconUploadArea', 'appIcon', 'iconPreview');
 
 const websiteForm = document.getElementById('websiteForm');
 if (websiteForm) {
-    // Auto-generate package name
     const appNameInput = document.getElementById('appName');
     const pkgInput = document.getElementById('packageName');
     appNameInput.addEventListener('blur', () => {
@@ -300,7 +295,6 @@ function renderFileList() {
 
 const htmlForm = document.getElementById('htmlForm');
 if (htmlForm) {
-    // Auto-generate package name
     const htmlAppNameInput = document.getElementById('htmlAppName');
     const htmlPkgInput = document.getElementById('htmlPackageName');
     htmlAppNameInput.addEventListener('blur', () => {
