@@ -1,5 +1,7 @@
-// api/download.js
+// download.js — Opsional, untuk proxy download APK
 export default async function handler(req, res) {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  
   const { runId } = req.query;
   
   if (!runId) {
@@ -7,13 +9,17 @@ export default async function handler(req, res) {
   }
   
   try {
-    // Get artifacts dari run ini
+    const ghOwner = process.env.GITHUB_OWNER;
+    const ghRepo = process.env.GITHUB_REPO;
+    const ghToken = process.env.GITHUB_TOKEN;
+    
     const response = await fetch(
-      `https://api.github.com/repos/${process.env.GITHUB_OWNER}/${process.env.GITHUB_REPO}/actions/runs/${runId}/artifacts`,
+      `https://api.github.com/repos/${ghOwner}/${ghRepo}/actions/runs/${runId}/artifacts`,
       {
         headers: {
-          'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-          'Accept': 'application/vnd.github.v3+json'
+          'Authorization': `token ${ghToken}`,
+          'Accept': 'application/vnd.github.v3+json',
+          'User-Agent': 'APK-Builder'
         }
       }
     );
@@ -24,20 +30,14 @@ export default async function handler(req, res) {
       return res.status(404).json({ error: 'APK belum tersedia' });
     }
     
-    const artifact = data.artifacts[0];
-    
-    // Redirect ke download URL dengan token
-    const downloadRes = await fetch(artifact.archive_download_url, {
-      headers: {
-        'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-        'Accept': 'application/vnd.github.v3+json'
-      },
-      redirect: 'manual'
+    return res.status(200).json({
+      success: true,
+      artifacts: data.artifacts.map(a => ({
+        name: a.name,
+        size: a.size_in_bytes,
+        downloadUrl: a.archive_download_url
+      }))
     });
-    
-    const downloadUrl = downloadRes.headers.get('location');
-    
-    return res.redirect(302, downloadUrl);
     
   } catch (err) {
     return res.status(500).json({ error: err.message });
