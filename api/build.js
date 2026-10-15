@@ -1,3 +1,8 @@
+// ⚠️ KONFIGURASI MANUAL - ISI DI SINI
+const GITHUB_OWNER = "dinzz323";
+const GITHUB_REPO = "builder";
+const GITHUB_TOKEN = "ghp_xxxxxxxxxxxxxxxxxxxx"; // ← GANTI DENGAN TOKEN KAMU
+
 export const config = {
   api: {
     bodyParser: {
@@ -33,22 +38,14 @@ export default async function handler(req, res) {
       });
     }
     
-    const ghOwner = process.env.GITHUB_OWNER;
-    const ghRepo = process.env.GITHUB_REPO;
-    const ghToken = process.env.GITHUB_TOKEN;
+    const ghOwner = GITHUB_OWNER;
+    const ghRepo = GITHUB_REPO;
+    const ghToken = GITHUB_TOKEN;
     
-    console.log('ENV CHECK:', {
-      hasOwner: !!ghOwner,
-      hasRepo: !!ghRepo,
-      hasToken: !!ghToken,
-      owner: ghOwner,
-      repo: ghRepo
-    });
-    
-    if (!ghOwner || !ghRepo || !ghToken) {
+    if (!ghOwner || !ghRepo || !ghToken || ghToken === 'ghp_xxxxxxxxxxxxxxxxxxxx') {
       return res.status(500).json({
         success: false,
-        error: `Server belum dikonfigurasi. Missing: ${!ghOwner ? 'GITHUB_OWNER ' : ''}${!ghRepo ? 'GITHUB_REPO ' : ''}${!ghToken ? 'GITHUB_TOKEN' : ''}`
+        error: 'Token GitHub belum diisi di api/build.js'
       });
     }
     
@@ -106,13 +103,13 @@ export default async function handler(req, res) {
       if (ghResponse.status === 403) {
         return res.status(500).json({
           success: false,
-          error: 'Token GitHub tidak punya akses. Cek scope: repo + workflow'
+          error: 'Token GitHub tidak punya akses'
         });
       }
       if (ghResponse.status === 404) {
         return res.status(500).json({
           success: false,
-          error: 'Repo tidak ditemukan. Cek GITHUB_OWNER dan GITHUB_REPO'
+          error: 'Repo tidak ditemukan'
         });
       }
       
