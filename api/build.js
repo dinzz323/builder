@@ -37,10 +37,18 @@ export default async function handler(req, res) {
     const ghRepo = process.env.GITHUB_REPO;
     const ghToken = process.env.GITHUB_TOKEN;
     
+    console.log('ENV CHECK:', {
+      hasOwner: !!ghOwner,
+      hasRepo: !!ghRepo,
+      hasToken: !!ghToken,
+      owner: ghOwner,
+      repo: ghRepo
+    });
+    
     if (!ghOwner || !ghRepo || !ghToken) {
       return res.status(500).json({
         success: false,
-        error: 'Server belum dikonfigurasi. Hubungi admin.'
+        error: `Server belum dikonfigurasi. Missing: ${!ghOwner ? 'GITHUB_OWNER ' : ''}${!ghRepo ? 'GITHUB_REPO ' : ''}${!ghToken ? 'GITHUB_TOKEN' : ''}`
       });
     }
     
@@ -92,13 +100,19 @@ export default async function handler(req, res) {
       if (ghResponse.status === 401) {
         return res.status(500).json({
           success: false,
-          error: 'Token GitHub tidak valid. Silakan periksa kembali.'
+          error: 'Token GitHub tidak valid atau expired'
+        });
+      }
+      if (ghResponse.status === 403) {
+        return res.status(500).json({
+          success: false,
+          error: 'Token GitHub tidak punya akses. Cek scope: repo + workflow'
         });
       }
       if (ghResponse.status === 404) {
         return res.status(500).json({
           success: false,
-          error: 'Repo GitHub tidak ditemukan. Cek GITHUB_OWNER dan GITHUB_REPO.'
+          error: 'Repo tidak ditemukan. Cek GITHUB_OWNER dan GITHUB_REPO'
         });
       }
       
