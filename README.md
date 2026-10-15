@@ -1,32 +1,49 @@
 # 📱 APK Builder
 
-Build APK from Website URL or HTML files using GitHub Actions + Vercel.
+Build APK dari URL Website atau file HTML menggunakan GitHub Actions + Vercel.
 
-## 🚀 Deploy
+## 🚀 Fitur
 
-### 1. Fork/Clone Repo
+- ✅ Website to APK — ubah URL website jadi aplikasi Android
+- ✅ HTML to APK — upload file HTML/ZIP jadi aplikasi Android
+- ✅ Custom ikon aplikasi
+- ✅ Pilih orientasi layar (portrait/landscape)
+- ✅ Build otomatis via GitHub Actions
+- ✅ 100% gratis
 
-### 2. GitHub Setup
-- Buat Personal Access Token (Settings → Developer settings → Tokens)
+## 📁 Struktur
+
+- `index.html` — Halaman Website to APK
+- `html-builder.html` — Halaman HTML to APK
+- `style.css` — Styling
+- `script.js` — Logic frontend
+- `build.js` — API trigger build
+- `status.js` — API cek status build
+- `download.js` — API info artifact (opsional)
+- `.github/workflows/build-apk.yml` — Workflow build APK
+
+## ⚙️ Setup
+
+### 1. GitHub Token
+- Buat di https://github.com/settings/tokens
 - Scope: `repo` + `workflow`
-- Copy token
 
-### 3. Vercel Setup
-- Import repo ke Vercel
+### 2. Deploy ke Vercel
+- Import repo ini ke Vercel
 - Set Environment Variables:
-  - `GITHUB_TOKEN` = ghp_xxx
+  - `GITHUB_TOKEN` = ghp_xxxxx
   - `GITHUB_OWNER` = username-github
-  - `GITHUB_REPO` = apk-builder
+  - `GITHUB_REPO` = nama-repo-ini
 
-### 4. GitHub Actions Permission
-- Settings → Actions → General
-- Workflow permissions → **Read and write** ✅
+### 3. Aktifkan Actions Write Permission
+- GitHub repo → Settings → Actions → General
+- Workflow permissions → **Read and write**
 
-### 5. Deploy!
-Buka URL Vercel → Isi form → Build APK → Tunggu 3-5 menit → Download!
+### 4. Test
+- Buka URL Vercel
+- Isi form → Build APK
+- Tunggu 3-5 menit → Download dari GitHub Actions Artifacts
 
-## 📊 Struktur
+## 📄 Lisensi
 
-- `public/` → Frontend (Vercel)
-- `api/` → Serverless functions
-- `.github/workflows/` → Build engine
+MIT
