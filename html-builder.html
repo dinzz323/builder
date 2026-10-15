@@ -3,26 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>APK Builder - HTML to APK</title>
+    <title>APK Builder — HTML to APK</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
+    <canvas id="bgCanvas"></canvas>
+    <div class="floating-shapes">
+        <div class="shape shape-1"></div>
+        <div class="shape shape-2"></div>
+        <div class="shape shape-3"></div>
+        <div class="shape shape-4"></div>
+    </div>
+
     <nav class="navbar">
-        <div class="logo"><i class="fas fa-cube"></i> APK Builder</div>
+        <div class="logo">
+            <i class="fas fa-cube"></i>
+            <span>APK Builder</span>
+        </div>
         <div class="nav-links">
-            <a href="index.html">Website to APK</a>
-            <a href="html-builder.html" class="active">HTML to APK</a>
+            <a href="index.html">
+                <i class="fas fa-globe"></i> Website to APK
+            </a>
+            <a href="html-builder.html" class="active">
+                <i class="fas fa-file-code"></i> HTML to APK
+            </a>
         </div>
     </nav>
 
     <main class="container">
         <header class="page-header">
+            <div class="badge"><i class="fas fa-bolt"></i> Powered by GitHub Actions</div>
             <h1><i class="fas fa-file-code"></i> HTML to APK</h1>
             <p>Upload file HTML (ZIP jika ada CSS/JS) dan ubah menjadi aplikasi Android</p>
         </header>
 
-        <form id="htmlForm" class="builder-form">
+        <form id="htmlForm" class="builder-form glass">
             <div class="form-section">
                 <h2><i class="fas fa-info-circle"></i> Informasi Aplikasi</h2>
                 <div class="form-group">
@@ -47,7 +63,7 @@
             <div class="form-section">
                 <h2><i class="fas fa-upload"></i> Upload File HTML</h2>
                 <div class="upload-area large" id="htmlUploadArea">
-                    <input type="file" id="htmlFiles" accept=".html,.htm,.zip,.css,.js,.png,.jpg,.jpeg,.svg,.gif,.json,.ico" multiple hidden>
+                    <input type="file" id="htmlFiles" accept=".html,.htm,.zip,.css,.js,.png,.jpg,.jpeg,.svg,.gif,.json,.ico,.webp" multiple hidden>
                     <i class="fas fa-file-archive"></i>
                     <p><strong>Klik untuk upload</strong> atau drag file ke sini</p>
                     <small>Mendukung: HTML, ZIP, CSS, JS, Images (max 50MB total)</small>
@@ -60,23 +76,20 @@
                 <div class="form-group">
                     <label>Ikon Aplikasi (PNG 512x512)</label>
                     <div class="upload-area" id="htmlIconUploadArea">
-                        <input type="file" id="htmlAppIcon" accept="image/png" hidden>
+                        <input type="file" id="htmlAppIcon" accept="image/png,image/jpeg,image/webp" hidden>
                         <i class="fas fa-cloud-upload-alt"></i>
                         <p>Klik untuk upload ikon</p>
-                        <img id="htmlIconPreview" style="display:none; max-width:120px; margin-top:10px;">
+                        <small>Format: PNG/JPG, min 512x512</small>
+                        <img id="htmlIconPreview" style="display:none;">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Warna Tema</label>
-                        <input type="color" id="htmlThemeColor" value="#667eea">
-                    </div>
-                    <div class="form-group">
                         <label>Orientasi Layar</label>
                         <select id="htmlOrientation">
-                            <option value="portrait">Portrait</option>
-                            <option value="landscape">Landscape</option>
-                            <option value="auto">Auto Rotate</option>
+                            <option value="portrait">📱 Portrait</option>
+                            <option value="landscape">🖥️ Landscape</option>
+                            <option value="auto">🔄 Auto Rotate</option>
                         </select>
                     </div>
                 </div>
@@ -87,7 +100,7 @@
             </button>
         </form>
 
-        <div id="htmlProgressBox" class="result-box" style="display:none;">
+        <div id="htmlProgressBox" class="result-box glass" style="display:none;">
             <h3 id="htmlProgressTitle"><i class="fas fa-spinner fa-spin"></i> Sedang Build APK...</h3>
             <p id="htmlProgressMsg">Mengirim permintaan ke server build...</p>
             <div class="progress-bar">
@@ -99,7 +112,7 @@
     </main>
 
     <footer class="footer">
-        <p>&copy; 2025 APK Builder. Powered by GitHub Actions.</p>
+        <p>&copy; 2025 APK Builder. Powered by GitHub Actions + Vercel.</p>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
