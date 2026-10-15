@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APK Builder - HTML to APK</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-cube"></i> APK Builder</div>
+        <div class="nav-links">
+            <a href="/">Website to APK</a>
+            <a href="/html-builder.html" class="active">HTML to APK</a>
+        </div>
+    </nav>
+
+    <main class="container">
+        <header class="page-header">
+            <h1><i class="fas fa-file-code"></i> HTML to APK</h1>
+            <p>Upload file HTML (ZIP jika ada CSS/JS) dan ubah menjadi aplikasi Android</p>
+        </header>
+
+        <form id="htmlForm" class="builder-form">
+            <div class="form-section">
+                <h2><i class="fas fa-info-circle"></i> Informasi Aplikasi</h2>
+                <div class="form-group">
+                    <label>Nama Aplikasi *</label>
+                    <input type="text" id="htmlAppName" placeholder="Contoh: Portfolio Saya" required>
+                </div>
+                <div class="form-group">
+                    <label>Package Name *</label>
+                    <input type="text" id="htmlPackageName" placeholder="com.example.htmlapp" required>
+                </div>
+                <div class="form-group">
+                    <label>Versi Aplikasi</label>
+                    <input type="text" id="htmlVersionName" value="1.0.0">
+                </div>
+                <div class="form-group">
+                    <label>Nama File Utama</label>
+                    <input type="text" id="mainFile" value="index.html">
+                    <small>File HTML utama yang akan dibuka</small>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2><i class="fas fa-upload"></i> Upload File HTML</h2>
+                <div class="upload-area large" id="htmlUploadArea">
+                    <input type="file" id="htmlFiles" accept=".html,.htm,.zip,.css,.js,.png,.jpg,.jpeg,.svg,.gif,.json,.ico" multiple hidden>
+                    <i class="fas fa-file-archive"></i>
+                    <p><strong>Klik untuk upload</strong> atau drag file ke sini</p>
+                    <small>Mendukung: HTML, ZIP, CSS, JS, Images (max 50MB total)</small>
+                </div>
+                <div id="fileList" class="file-list"></div>
+            </div>
+
+            <div class="form-section">
+                <h2><i class="fas fa-palette"></i> Ikon & Tampilan</h2>
+                <div class="form-group">
+                    <label>Ikon Aplikasi (PNG 512x512)</label>
+                    <div class="upload-area" id="htmlIconUploadArea">
+                        <input type="file" id="htmlAppIcon" accept="image/png" hidden>
+                        <i class="fas fa-cloud-upload-alt"></i>
+                        <p>Klik untuk upload ikon</p>
+                        <img id="htmlIconPreview" style="display:none; max-width:120px; margin-top:10px;">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Warna Tema</label>
+                        <input type="color" id="htmlThemeColor" value="#667eea">
+                    </div>
+                    <div class="form-group">
+                        <label>Orientasi Layar</label>
+                        <select id="htmlOrientation">
+                            <option value="portrait">Portrait</option>
+                            <option value="landscape">Landscape</option>
+                            <option value="auto">Auto Rotate</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary">
+                <i class="fas fa-hammer"></i> Build APK dari HTML
+            </button>
+        </form>
+
+        <div id="htmlProgressBox" class="result-box" style="display:none;">
+            <h3 id="htmlProgressTitle"><i class="fas fa-spinner fa-spin"></i> Sedang Build APK...</h3>
+            <p id="htmlProgressMsg">Mengirim permintaan ke server build...</p>
+            <div class="progress-bar">
+                <div class="progress-fill" id="htmlProgressFill"></div>
+            </div>
+            <div id="htmlDownloadSection"></div>
+            <p class="hint-text">⏱️ Estimasi: 3-5 menit. Jangan tutup halaman ini.</p>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 APK Builder. Powered by GitHub Actions.</p>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
