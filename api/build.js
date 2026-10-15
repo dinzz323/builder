@@ -1,8 +1,3 @@
-// ⚠️ KONFIGURASI MANUAL - ISI DI SINI
-const GITHUB_OWNER = "dinzz323";
-const GITHUB_REPO = "builder";
-const GITHUB_TOKEN = "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"; // ← GANTI DENGAN TOKEN KAMU
-
 export const config = {
   api: {
     bodyParser: {
@@ -38,14 +33,14 @@ export default async function handler(req, res) {
       });
     }
     
-    const ghOwner = GITHUB_OWNER;
-    const ghRepo = GITHUB_REPO;
-    const ghToken = GITHUB_TOKEN;
+    const ghOwner = process.env.GITHUB_OWNER;
+    const ghRepo = process.env.GITHUB_REPO;
+    const ghToken = process.env.GITHUB_TOKEN;
     
-    if (!ghOwner || !ghRepo || !ghToken || ghToken === 'ghp_xxxxxxxxxxxxxxxxxxxx') {
+    if (!ghOwner || !ghRepo || !ghToken) {
       return res.status(500).json({
         success: false,
-        error: 'Token GitHub belum diisi di api/build.js'
+        error: `Server belum dikonfigurasi. Missing: ${!ghOwner ? 'GITHUB_OWNER ' : ''}${!ghRepo ? 'GITHUB_REPO ' : ''}${!ghToken ? 'GITHUB_TOKEN' : ''}`
       });
     }
     
@@ -97,19 +92,19 @@ export default async function handler(req, res) {
       if (ghResponse.status === 401) {
         return res.status(500).json({
           success: false,
-          error: 'Token GitHub tidak valid atau expired'
+          error: 'Token GitHub tidak valid atau expired. Buat token baru di Vercel Environment Variables.'
         });
       }
       if (ghResponse.status === 403) {
         return res.status(500).json({
           success: false,
-          error: 'Token GitHub tidak punya akses'
+          error: 'Token GitHub tidak punya akses. Cek scope: repo + workflow'
         });
       }
       if (ghResponse.status === 404) {
         return res.status(500).json({
           success: false,
-          error: 'Repo tidak ditemukan'
+          error: 'Repo tidak ditemukan. Cek GITHUB_OWNER dan GITHUB_REPO'
         });
       }
       
