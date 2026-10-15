@@ -26,7 +26,6 @@ body {
     position: relative;
 }
 
-/* ====== ANIMATED BACKGROUND CANVAS ====== */
 #bgCanvas {
     position: fixed;
     top: 0;
@@ -37,7 +36,6 @@ body {
     pointer-events: none;
 }
 
-/* ====== FLOATING SHAPES ====== */
 .floating-shapes {
     position: fixed;
     top: 0;
@@ -113,7 +111,6 @@ body {
     50% { transform: translate(100px, -80px) rotate(180deg); }
 }
 
-/* ====== NAVBAR ====== */
 .navbar {
     position: sticky;
     top: 0;
@@ -180,7 +177,6 @@ body {
     box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
-/* ====== CONTAINER ====== */
 .container {
     max-width: 900px;
     margin: 2rem auto;
@@ -235,7 +231,6 @@ body {
     font-size: 0.95rem;
 }
 
-/* ====== GLASS FORM ====== */
 .glass {
     background: rgba(255, 255, 255, 0.08);
     backdrop-filter: blur(20px);
@@ -336,7 +331,6 @@ body {
     gap: 1rem;
 }
 
-/* ====== UPLOAD AREA ====== */
 .upload-area {
     border: 2px dashed rgba(255, 255, 255, 0.25);
     border-radius: 14px;
@@ -388,7 +382,6 @@ body {
     margin-top: 12px;
 }
 
-/* ====== FILE LIST ====== */
 .file-list {
     margin-top: 1rem;
 }
@@ -439,7 +432,6 @@ body {
     transform: scale(1.2);
 }
 
-/* ====== BUTTON ====== */
 .btn-primary {
     width: 100%;
     padding: 1rem;
@@ -479,7 +471,6 @@ body {
     cursor: not-allowed;
 }
 
-/* ====== RESULT BOX ====== */
 .result-box {
     padding: 2rem;
     margin-top: 2rem;
@@ -549,7 +540,6 @@ body {
     box-shadow: 0 12px 35px rgba(34, 197, 94, 0.6);
 }
 
-/* ====== FOOTER ====== */
 .footer {
     text-align: center;
     color: rgba(255, 255, 255, 0.5);
@@ -559,7 +549,6 @@ body {
     z-index: 10;
 }
 
-/* ====== RESPONSIVE ====== */
 @media (max-width: 600px) {
     .navbar {
         flex-direction: column;
