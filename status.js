@@ -1,4 +1,4 @@
-// api/status.js — Cek status build
+// status.js — API endpoint /api/status
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   
@@ -17,10 +17,13 @@ export default async function handler(req, res) {
     const ghRepo = process.env.GITHUB_REPO;
     const ghToken = process.env.GITHUB_TOKEN;
     
+    if (!ghOwner || !ghRepo || !ghToken) {
+      throw new Error('GitHub env variables belum diset');
+    }
+    
     let targetRunId = runId;
     
-    // Jika tidak ada runId, cari run terbaru
-    if (!targetRunId) {
+    if (!targetRunId || targetRunId === 'null' || targetRunId === 'undefined') {
       const runsRes = await fetch(
         `https://api.github.com/repos/${ghOwner}/${ghRepo}/actions/runs?event=repository_dispatch&per_page=10`,
         {
@@ -36,7 +39,6 @@ export default async function handler(req, res) {
       
       const runsData = await runsRes.json();
       
-      // Cari run dalam 10 menit terakhir
       const recent = runsData.workflow_runs.filter(r => {
         const t = new Date(r.created_at).getTime();
         return Date.now() - t < 10 * 60 * 1000;
@@ -54,7 +56,6 @@ export default async function handler(req, res) {
       targetRunId = recent[0].id;
     }
     
-    // Get specific run
     const runRes = await fetch(
       `https://api.github.com/repos/${ghOwner}/${ghRepo}/actions/runs/${targetRunId}`,
       {
