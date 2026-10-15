@@ -1,1 +1,188 @@
+name: Build APK from User Request
 
+on:
+  repository_dispatch:
+    types: [build_apk]
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Setup Java JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      
+      - name: Extract config
+        id: cfg
+        run: |
+          echo '${{ toJson(github.event.client_payload) }}' > /tmp/payload.json
+          cat /tmp/payload.json
+          
+          APP_NAME=$(jq -r '.appName' /tmp/payload.json)
+          PACKAGE_NAME=$(jq -r '.packageName' /tmp/payload.json)
+          APP_TYPE=$(jq -r '.type' /tmp/payload.json)
+          WEBSITE_URL=$(jq -r '.url // ""' /tmp/payload.json)
+          MAIN_FILE=$(jq -r '.mainFile // "index.html"' /tmp/payload.json)
+          ICON_URL=$(jq -r '.iconUrl // ""' /tmp/payload.json)
+          HTML_URL=$(jq -r '.htmlContentUrl // ""' /tmp/payload.json)
+          ORIENTATION=$(jq -r '.orientation // "portrait"' /tmp/payload.json)
+          
+          echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+          echo "package_name=$PACKAGE_NAME" >> $GITHUB_OUTPUT
+          echo "app_type=$APP_TYPE" >> $GITHUB_OUTPUT
+          echo "website_url=$WEBSITE_URL" >> $GITHUB_OUTPUT
+          echo "main_file=$MAIN_FILE" >> $GITHUB_OUTPUT
+          echo "icon_url=$ICON_URL" >> $GITHUB_OUTPUT
+          echo "html_url=$HTML_URL" >> $GITHUB_OUTPUT
+          echo "orientation=$ORIENTATION" >> $GITHUB_OUTPUT
+      
+      - name: Install Capacitor CLI
+        run: |
+          npm install -g @capacitor/cli
+          npm install @capacitor/core @capacitor/cli @capacitor/android
+      
+      - name: Prepare web assets
+        run: |
+          mkdir -p www
+          
+          if [ "${{ steps.cfg.outputs.app_type }}" = "website" ]; then
+            echo "Mode: WEBSITE"
+            cat > www/index.html << 'HTMLEOF'
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              html, body { width: 100%; height: 100%; overflow: hidden; background: #fff; }
+              iframe { width: 100%; height: 100%; border: none; display: block; }
+            </style>
+          </head>
+          <body>
+            <iframe id="webview" src="WEBSITE_URL_PLACEHOLDER" 
+                    allow="geolocation; microphone; camera; payment; autoplay; clipboard-read; clipboard-write"
+                    sandbox="allow-forms allow-modals allow-popups allow-same-origin allow-scripts allow-top-navigation allow-downloads">
+            </iframe>
+          </body>
+          </html>
+          HTMLEOF
+            sed -i "s|WEBSITE_URL_PLACEHOLDER|${{ steps.cfg.outputs.website_url }}|g" www/index.html
+          else
+            echo "Mode: HTML"
+            if [ -n "${{ steps.cfg.outputs.html_url }}" ]; then
+              curl -L "${{ steps.cfg.outputs.html_url }}" -o /tmp/html.zip
+              cd www
+              unzip -o /tmp/html.zip
+              cd ..
+            else
+              echo "<h1>No HTML content</h1>" > www/index.html
+            fi
+          fi
+          
+          echo "=== Web files ==="
+          ls -la www/
+      
+      - name: Init Capacitor
+        run: |
+          cat > package.json << 'EOF'
+          {
+            "name": "app",
+            "version": "1.0.0",
+            "dependencies": {
+              "@capacitor/core": "^5.0.0",
+              "@capacitor/android": "^5.0.0"
+            }
+          }
+          EOF
+          
+          cat > capacitor.config.json << EOF
+          {
+            "appId": "${{ steps.cfg.outputs.package_name }}",
+            "appName": "${{ steps.cfg.outputs.app_name }}",
+            "webDir": "www",
+            "server": {
+              "androidScheme": "https",
+              "cleartext": true
+            },
+            "android": {
+              "allowMixedContent": true,
+              "captureInput": true,
+              "webContentsDebuggingEnabled": false
+            }
+          }
+          EOF
+          
+          npx cap add android
+          npx cap sync android
+      
+      - name: Configure orientation
+        run: |
+          MANIFEST="android/app/src/main/AndroidManifest.xml"
+          ORIENT="${{ steps.cfg.outputs.orientation }}"
+          
+          if [ "$ORIENT" = "landscape" ]; then
+            sed -i 's|<activity|<activity android:screenOrientation="landscape"|g' $MANIFEST
+          elif [ "$ORIENT" = "portrait" ]; then
+            sed -i 's|<activity|<activity android:screenOrientation="portrait"|g' $MANIFEST
+          fi
+          
+          cat $MANIFEST
+      
+      - name: Apply custom icon
+        if: steps.cfg.outputs.icon_url != ''
+        run: |
+          sudo apt-get install -y imagemagick > /dev/null 2>&1
+          
+          echo "Downloading icon..."
+          curl -L "${{ steps.cfg.outputs.icon_url }}" -o /tmp/icon.png
+          file /tmp/icon.png
+          
+          cd android/app/src/main/res
+          
+          for config in "mdpi:48" "hdpi:72" "xhdpi:96" "xxhdpi:144" "xxxhdpi:192"; do
+            dir="mipmap-${config%%:*}"
+            size="${config##*:}"
+            mkdir -p $dir
+            convert /tmp/icon.png -resize ${size}x${size}! $dir/ic_launcher.png 2>/dev/null || cp /tmp/icon.png $dir/ic_launcher.png
+            convert /tmp/icon.png -resize ${size}x${size}! $dir/ic_launcher_round.png 2>/dev/null || cp /tmp/icon.png $dir/ic_launcher_round.png
+            convert /tmp/icon.png -resize ${size}x${size}! $dir/ic_launcher_foreground.png 2>/dev/null || cp /tmp/icon.png $dir/ic_launcher_foreground.png
+          done
+          
+          echo "Icons applied"
+      
+      - name: Build APK
+        run: |
+          cd android
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon --stacktrace
+      
+      - name: Prepare output
+        run: |
+          SAFE_NAME=$(echo "${{ steps.cfg.outputs.app_name }}" | tr ' ' '_' | tr -cd '[:alnum:]_-')
+          if [ -z "$SAFE_NAME" ]; then SAFE_NAME="app"; fi
+          mkdir -p output
+          cp android/app/build/outputs/apk/debug/app-debug.apk "output/${SAFE_NAME}.apk"
+          ls -lh output/
+      
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: apk-build
+          path: output/*.apk
+          retention-days: 7
