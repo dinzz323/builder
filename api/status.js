@@ -1,7 +1,7 @@
 // ⚠️ KONFIGURASI MANUAL - ISI DI SINI
 const GITHUB_OWNER = "dinzz323";
 const GITHUB_REPO = "builder";
-const GITHUB_TOKEN = "ghp_xxxxxxxxxxxxxxxxxxxx"; // ← GANTI DENGAN TOKEN KAMU
+const GITHUB_TOKEN = "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"; // ← GANTI DENGAN TOKEN KAMU
 
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
