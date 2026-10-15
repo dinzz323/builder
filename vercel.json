@@ -1,20 +1,24 @@
 {
   "version": 2,
-  "public": true,
   "cleanUrls": true,
   "trailingSlash": false,
   "rewrites": [
-    { "source": "/", "destination": "/public/index.html" },
-    { "source": "/html-builder.html", "destination": "/public/html-builder.html" },
-    { "source": "/style.css", "destination": "/public/style.css" },
-    { "source": "/script.js", "destination": "/public/script.js" },
-    { "source": "/api/build", "destination": "/api/build.js" },
-    { "source": "/api/status", "destination": "/api/status.js" }
+    { "source": "/api/build", "destination": "/build.js" },
+    { "source": "/api/status", "destination": "/status.js" },
+    { "source": "/api/download", "destination": "/download.js" }
   ],
   "functions": {
-    "api/*.js": {
+    "build.js": {
       "maxDuration": 30,
       "memory": 1024
+    },
+    "status.js": {
+      "maxDuration": 15,
+      "memory": 512
+    },
+    "download.js": {
+      "maxDuration": 15,
+      "memory": 512
     }
   }
 }
