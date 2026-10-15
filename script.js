@@ -25,7 +25,6 @@ function initAnimatedBackground() {
     
     const particles = [];
     const PARTICLE_COUNT = 60;
-    
     const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#43e97b'];
     
     class Particle {
@@ -117,13 +116,11 @@ function setupUpload(areaId, inputId, previewId, multiple = false) {
     
     if (!area || !input) return;
     
-    // Klik area = trigger input file
     area.addEventListener('click', (e) => {
         if (e.target === input) return;
         input.click();
     });
     
-    // Drag & drop
     area.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -160,9 +157,8 @@ function setupUpload(areaId, inputId, previewId, multiple = false) {
         }
     });
     
-    // Preview saat file dipilih
     input.addEventListener('change', () => {
-        if (multiple) return; // Skip preview untuk multiple
+        if (multiple) return;
         
         const file = input.files[0];
         if (file && preview) {
@@ -195,7 +191,6 @@ async function startBuild(config, ids) {
     downloadSection.innerHTML = '';
     
     try {
-        // Prepare icon
         let iconBase64 = null;
         if (config.icon) {
             progressMsg.textContent = 'Memproses ikon...';
@@ -203,7 +198,6 @@ async function startBuild(config, ids) {
             iconBase64 = await fileToBase64(config.icon);
         }
         
-        // Prepare HTML files (ZIP)
         let htmlContentBase64 = null;
         if (config.type === 'html' && config.files && config.files.length) {
             progressMsg.textContent = 'Mengemas file HTML...';
@@ -229,7 +223,6 @@ async function startBuild(config, ids) {
         progressMsg.textContent = 'Mengirim ke server build...';
         progressFill.style.width = '30%';
         
-        // Send to API
         const response = await fetch('/api/build', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -246,7 +239,6 @@ async function startBuild(config, ids) {
             })
         });
         
-        // Parse response dengan aman
         const contentType = response.headers.get('content-type');
         let result;
         
@@ -254,7 +246,7 @@ async function startBuild(config, ids) {
             result = await response.json();
         } else {
             const text = await response.text();
-            throw new Error(`Server mengembalikan response tidak valid (${response.status}). Pastikan API berjalan dengan benar.`);
+            throw new Error(`Server error ${response.status}. API tidak mengembalikan JSON.`);
         }
         
         if (!result.success) {
@@ -266,7 +258,6 @@ async function startBuild(config, ids) {
         progressMsg.textContent = 'Build dimulai! Menunggu GitHub Actions...';
         progressFill.style.width = '40%';
         
-        // Polling status
         let attempts = 0;
         const maxAttempts = 120;
         
@@ -385,12 +376,10 @@ let htmlFilesData = [];
 const htmlFilesInput = document.getElementById('htmlFiles');
 const fileListEl = document.getElementById('fileList');
 
-// HTML FILES UPLOAD - FIXED!
 if (htmlFilesInput) {
     htmlFilesInput.addEventListener('change', () => {
         const newFiles = Array.from(htmlFilesInput.files);
         
-        // Gabungkan dengan file yang sudah ada (hindari duplikat nama)
         newFiles.forEach(newFile => {
             const exists = htmlFilesData.find(f => f.name === newFile.name && f.size === newFile.size);
             if (!exists) {
@@ -399,8 +388,6 @@ if (htmlFilesInput) {
         });
         
         renderFileList();
-        
-        // Reset input supaya bisa upload file yang sama lagi
         htmlFilesInput.value = '';
     });
 }
