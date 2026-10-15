@@ -19,7 +19,7 @@ export default async function handler(req, res) {
     if (!ghOwner || !ghRepo || !ghToken) {
       return res.status(500).json({
         status: 'error',
-        message: 'Server belum dikonfigurasi'
+        message: `Server belum dikonfigurasi. Missing: ${!ghOwner ? 'GITHUB_OWNER ' : ''}${!ghRepo ? 'GITHUB_REPO ' : ''}${!ghToken ? 'GITHUB_TOKEN' : ''}`
       });
     }
     
