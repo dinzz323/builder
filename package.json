@@ -1,6 +1,0 @@
-{
-  "name": "apk-builder",
-  "version": "1.0.0",
-  "private": true,
-  "description": "Build APK from website URL or HTML files using GitHub Actions"
-}
